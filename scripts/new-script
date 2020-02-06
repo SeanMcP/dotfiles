@@ -1,0 +1,20 @@
+#!/bin/bash
+
+SCRIPTS_DIR=~/.scripts
+
+name=$1
+
+if [ -z $name ]
+then
+    echo "Name your new script:"
+    read read_name
+    name=$read_name
+fi
+
+SCRIPT_PATH=$SCRIPTS_DIR/$name
+
+echo -e "#!/bin/bash\n" > $SCRIPT_PATH
+
+chmod u+x $SCRIPT_PATH
+
+code -g $SCRIPT_PATH:3:0
