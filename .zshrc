@@ -1,5 +1,7 @@
-# Functions
+# Aliases
+alias grepjs='grep -rno --exclude-dir=node_modules --exclude-dir=".git" --exclude-dir=cache --exclude="*-lock.*"'
 
+# Functions
 
 # rpj - Read package.json
 function rpj () {
