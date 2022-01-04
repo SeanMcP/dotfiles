@@ -1,7 +1,60 @@
-# Aliases
-alias grepjs='grep -rno --exclude-dir=node_modules --exclude-dir=".git" --exclude-dir=cache --exclude="*-lock.*"'
+################
+# Variables
+################
+export DEV_DIR="$HOME/dev"
 
+################
+# Aliases
+################
+alias blog="code $DEV_DIR/seanmcp/seanmcp.com"
+alias dc=docker-compose
+alias flog="docker-compose logs -f"
+alias glc="git rev-parse HEAD | pbcopy"
+alias grepjs='grep -rno --exclude-dir=node_modules --exclude-dir=".git" --exclude-dir=cache --exclude="*-lock.*"'
+alias meet="open -a '/Applications/Google Chrome.app' 'https://meet.google.com/'"
+alias src="echo Sourcing from .zshrc; source $HOME/.zshrc"
+
+################
 # Functions
+################
+
+# Remove up-to-date git repositories
+function cleanup-repos() {
+  for D in *; do
+    if [ -d "${D}" ]; then
+      cd $D
+
+      if [[ -d .git ]]; then
+        # git pull
+        changes=$(git status | grep "use \"git" | wc -l | grep -o "[0-9]\+")
+
+        if [[ $changes = 0 ]]; then
+          echo -n "Do you want to remove $D? (Y/n) "
+          read answer
+
+          if [[ $answer = "Y" ]]; then
+            # Remove directory
+            echo "Removing $D"
+            cd ..
+            rm -rf "$D"
+          else
+            # Don't remove directory
+            echo "Preserving $D"
+            cd ..
+          fi
+        else
+          # There are changes!
+          echo "Changes found in $D. Resolve those and run this script again."
+          cd ..
+        fi
+      else
+        # No .git directory
+        echo "Skipping $D (no .git directory)"
+        cd ..
+      fi
+    fi
+  done
+}
 
 # rpj - Read package.json
 function rpj () {
@@ -10,36 +63,6 @@ function rpj () {
   else
       echo "There is no `package.json` in this directory"
   fi
-}
-
-# reflect
-function reflect () {
-  date_string=$(date +%Y-%m-%d)
-  dir_path="$NOTES_DIR/reflections"
-  mkdir -p $dir_path
-  file_path="$dir_path/$date_string.md"
-  echo "# Reflect $date_string\n\n## How did this week go?\n\n\n\n## What did you enjoy most this week?\n\n\n\n## What did you dislike this week?\n\n\n\n## What, if anything, set you back this week?\n\n\n\n## What are you going to try differently next week?" > $file_path
-  code $file_path
-}
-
-# note
-# @param string - The name of the note, e.g. "How the west was won"
-function   new-note () {
-  title="Scratchpad"
-  date_string=$(date +%Y-%m-%d)
-  dir_path="$NOTES_DIR/unorganized"
-  mkdir -p $dir_path
-
-  if [[ -n "$1" ]]
-    then
-      title=$1
-  fi
-
-  file_path="$dir_path/${date_string}_${title:l:gs/\ /\-}.md"
-
-  echo "# $title ($date_string)\n" > $file_path
-
-  code -g $file_path:3:0
 }
 
 # serve the current directory with Python
@@ -53,3 +76,15 @@ function serve() {
 
   python3 -m http.server $port
 }
+
+
+################
+# Git
+################
+
+# PROMPT="$ "
+autoload -Uz vcs_info
+precmd() { vcs_info }
+zstyle ':vcs_info:git:*' formats '[%b] '
+setopt PROMPT_SUBST
+PROMPT='${PWD/#$HOME/~} ${vcs_info_msg_0_}> '
