@@ -1,0 +1,7 @@
+#! usr/bin/env bash 
+
+# STOPCOMMIT
+if git grep "STOPCOMMIT"; then
+    echo "FATAL ERROR: Staged code contains STOPCOMMIT"
+    exit 1
+fi
