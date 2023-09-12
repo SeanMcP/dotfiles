@@ -7,6 +7,7 @@ export DEV_DIR="$HOME/dev"
 # Aliases
 ################
 alias blog="code $DEV_DIR/seanmcp/seanmcp.com"
+alias boop="osascript -e 'display notification \"done\" sound name \"default\"'"
 alias dc=docker-compose
 alias flog="docker-compose logs -f"
 alias glc="git rev-parse HEAD | pbcopy"
