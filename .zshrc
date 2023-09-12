@@ -77,6 +77,16 @@ function serve() {
   python3 -m http.server $port
 }
 
+# ss - Run a command in khan/webapp/services/static
+ss() {
+    bash -c "cd ~/khan/webapp/services/static && $*"
+}
+
+# ssb - Start storybook
+ssb() {
+    ss "yarn start:storybook"
+    open -a '/Applications/Google Chrome.app' 'http://localhost:8228'
+}
 
 ################
 # Git
