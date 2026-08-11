@@ -49,3 +49,26 @@ function serve() {
 void() {
     bash -c "cd ~/seanmcp/seanmcp.com && pnpm void $*"
 }
+
+# cgb, Copy Git Branch - copies the current git branch name to the clipboard
+cgb() {
+    branch=$(git branch --show-current)
+    if [ -z "$branch" ]; then
+        echo "Not in a git repository or no branch found."
+        return 1
+    fi
+    echo -n "$branch" | pbcopy
+    echo "Copied branch name '$branch' to clipboard."
+}
+
+# grepall PATTERN... — list files containing ALL given patterns
+grepall() {
+    [ "$#" -ge 1 ] || { echo "usage: grepall PATTERN..." >&2; return 1; }
+
+    local first="$1"; shift
+    local cmd="grep -rl -- \"\$first\" ."
+    for p in "$@"; do
+        cmd+=" | xargs grep -l -- \"$p\""
+    done
+    eval "$cmd"
+}
