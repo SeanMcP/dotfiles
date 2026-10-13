@@ -78,24 +78,36 @@ function serve() {
   python3 -m http.server $port
 }
 
-# ss - Run a command in khan/webapp/services/static
-ss() {
-    bash -c "cd ~/khan/webapp/services/static && $*"
-}
-
-# ssb - Start storybook
-ssb() {
-    ss "yarn start:storybook"
-    open -a '/Applications/Google Chrome.app' 'http://localhost:8228'
-}
-
 ################
 # Git
 ################
 
-# PROMPT="$ "
-autoload -Uz vcs_info
-precmd() { vcs_info }
-zstyle ':vcs_info:git:*' formats '[%b] '
+##################################################
+# Prompt
+##################################################
+
 setopt PROMPT_SUBST
-PROMPT='${PWD/#$HOME/~} ${vcs_info_msg_0_}> '
+
+git_prompt_info() {
+    local branch
+    branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+    # Detached HEAD: fall back to the short commit hash
+    if [[ -z $branch ]]; then
+        branch=$(git rev-parse --short HEAD 2>/dev/null)
+    fi
+
+    # Not in a git repo: print nothing
+    if [[ -z $branch ]]; then
+        return
+    fi
+
+    local dirty=""
+    if [[ -n $(git status --porcelain 2>/dev/null) ]]; then
+        dirty="*"
+    fi
+
+    echo "%F{blue}git:(%F{green}${branch}%F{blue})%F{red}${dirty}%f "
+}
+
+PROMPT='%1~ $(git_prompt_info)$ '
