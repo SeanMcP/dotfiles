@@ -13,7 +13,8 @@ alias flog="docker-compose logs -f"
 alias glc="git rev-parse HEAD | pbcopy"
 alias grepjs='grep -rno --exclude-dir=node_modules --exclude-dir=".git" --exclude-dir=cache --exclude="*-lock.*"'
 alias meet="open -a '/Applications/Google Chrome.app' 'https://meet.google.com/'"
-alias src="echo Sourcing from .zshrc; source $HOME/.zshrc"
+alias src="source ~/.zshrc && echo 'Sourced from .zshrc'"
+alias zrc="code ~/.zshrc"
 
 ################
 # Functions
