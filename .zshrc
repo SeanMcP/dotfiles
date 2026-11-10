@@ -79,6 +79,71 @@ function serve() {
   python3 -m http.server $port
 }
 
+# Keep the computer and display awake for a number of minutes.
+hang() {
+  setopt localoptions localtraps
+  unsetopt octalzeroes
+  if (( $# != 1 )) || [[ ! $1 =~ '^([0-9]+([.][0-9]*)?|[.][0-9]+)$' ]]; then
+    print -u2 'Usage: hang <positive number of minutes>'
+    return 1
+  fi
+
+  local -F minutes=$1
+  local -i seconds=$(( minutes * 60 + 0.5 ))
+  if (( minutes <= 0 || seconds < 1 )); then
+    print -u2 'Specify a positive duration that rounds to at least 1 second.'
+    return 1
+  fi
+
+  local hours duration
+  if (( seconds < 60 )); then
+    duration="$seconds second"
+    (( seconds != 1 )) && duration+='s'
+  elif (( minutes < 60 )); then
+    printf -v duration '%g' "$minutes"
+    duration+=' minute'
+    (( minutes != 1 )) && duration+='s'
+  else
+    printf -v hours '%.2f' "$(( minutes / 60.0 ))"
+    while [[ $hours == *0 ]]; do hours=${hours%0}; done
+    hours=${hours%.}
+    duration="$hours hour"
+    (( minutes != 60 )) && duration+='s'
+  fi
+
+  local -i started=$SECONDS elapsed interrupted=0 result
+  trap 'interrupted=1; print' INT
+  print -r -- "🦧 Hanging for $duration"
+  caffeinate -di -t "$seconds"
+  result=$?
+  elapsed=$(( SECONDS - started ))
+
+  # A completed timer reports its requested duration, excluding process overhead.
+  if (( !interrupted && result == 0 )); then
+    print -r -- "🤙 Hung for $duration"
+    return 0
+  fi
+
+  if (( elapsed < 60 )); then
+    duration="$elapsed second"
+    (( elapsed != 1 )) && duration+='s'
+  elif (( elapsed < 3600 )); then
+    local -i elapsed_minutes=$(( elapsed / 60 ))
+    duration="$elapsed_minutes minute"
+    (( elapsed_minutes != 1 )) && duration+='s'
+  else
+    printf -v hours '%.2f' "$(( elapsed / 3600.0 ))"
+    while [[ $hours == *0 ]]; do hours=${hours%0}; done
+    hours=${hours%.}
+    duration="$hours hour"
+    [[ $hours != 1 ]] && duration+='s'
+  fi
+
+  print -r -- "🤙 Hung for $duration"
+  (( interrupted )) && return 130
+  return $result
+}
+
 ################
 # Git
 ################
