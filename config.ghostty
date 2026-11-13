@@ -1,0 +1,12 @@
+# This is the configuration file for Ghostty.
+
+macos-icon = custom-style
+macos-icon-ghost-color = #ffffff
+macos-icon-screen-color = #000000
+theme = GitHub Dark Default
+font-size = 16
+
+keybind = super+arrow_up=new_split:up
+keybind = super+arrow_right=new_split:right
+keybind = super+arrow_down=new_split:down
+keybind = super+arrow_left=new_split:left
